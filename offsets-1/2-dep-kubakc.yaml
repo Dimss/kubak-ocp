@@ -1,0 +1,49 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kubakc-cg
+  lables:
+    app: kubakc-cg
+spec:
+  clusterIP: None
+  selector:
+    app: kubakc-cg
+  ports:
+  - name: http
+    port: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubakc-cg
+spec:
+  selector:
+    matchLabels:
+      app: kubakc-cg
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kubakc-cg
+    spec:
+      hostname: kubakc-cg-host
+      subdomain: kubakc-cg
+      containers:
+      - name: kubakc
+        image: docker-registry.default.svc:5000/kubak/kubakc:0.11
+        env:
+        - name: "APP_HOSTNAME_SUFFIX"
+          value: "kubakc-cg"
+        - name: "APP_REDIS_HOST"
+          value: "redis"
+        - name: "APP_BOOTSTRAP_SERVERS"
+          value: "kubak-kafka-bootstrap.kafka"
+        - name: "APP_CONSUMER_GROUP"
+          value: "group6"
+        - name: "APP_SERVICE_PORT"
+          value: "8080"
+        - name: "APP_KAFKA_OFFSET_RESET"
+          value: "latest"
+          # value: "earliest"
+        ports:
+        - containerPort: 8080

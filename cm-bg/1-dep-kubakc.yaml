@@ -1,0 +1,47 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kubakc
+  lables:
+    app: kubakc
+spec:
+  selector:
+    app: kubakc
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kubakc
+spec:
+  selector:
+    matchLabels:
+      app: kubakc
+  serviceName: "kubakc"
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: kubakc 
+    spec:
+      containers:
+      - name: kubakc
+        image: docker-registry.default.svc:5000/kubak/kubakc:0.10
+        env:
+        - name: "APP_HOSTNAME_SUFFIX"
+          value: "kubakc"
+        - name: "APP_REDIS_HOST"
+          value: "redis"
+        - name: "APP_BOOTSTRAP_SERVERS"
+          value: "kubak-kafka-bootstrap.kafka"
+        - name: "APP_CONSUMER_GROUP"
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: "APP_SERVICE_PORT"
+          value: "80"
+        ports:
+        - containerPort: 8080

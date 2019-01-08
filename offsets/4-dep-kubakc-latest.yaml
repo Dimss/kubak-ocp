@@ -1,0 +1,48 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kuback-latest
+  lables:
+    app: kuback-latest
+spec:
+  clusterIP: None
+  selector:
+    app: kuback-latest
+  ports:
+  - name: http
+    port: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuback-latest
+spec:
+  selector:
+    matchLabels:
+      app: kuback-latest
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kuback-latest
+    spec:
+      hostname: kuback-latest-host
+      subdomain: kuback-latest
+      containers:
+      - name: kubakc
+        image: docker-registry.default.svc:5000/kubak/kubakc:0.11
+        env:
+        - name: "APP_HOSTNAME_SUFFIX"
+          value: "kuback-latest"
+        - name: "APP_REDIS_HOST"
+          value: "redis"
+        - name: "APP_BOOTSTRAP_SERVERS"
+          value: "kubak-kafka-bootstrap.kafka"
+        - name: "APP_CONSUMER_GROUP"
+          value: "group10"
+        - name: "APP_SERVICE_PORT"
+          value: "8080"
+        - name: "APP_KAFKA_OFFSET_RESET"
+          value: "latest"
+        ports:
+        - containerPort: 8080

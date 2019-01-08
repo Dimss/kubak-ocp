@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ImageStream
+metadata:
+    name: kubakp
+spec:
+    tags:
+    - from:
+          kind: DockerImage
+          name: docker-registry.default.svc:5000/kubak/kubakp
+      name: latest
+      importPolicy:
+          scheduled: true

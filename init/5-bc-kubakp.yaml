@@ -1,0 +1,18 @@
+kind: "BuildConfig"
+apiVersion: "v1"
+metadata:
+  name: "kubakp"
+spec:
+  runPolicy: "Serial"
+  source:
+    git:
+      uri: "https://github.com/dimss/kubakp"
+  strategy:
+    sourceStrategy:
+      from:
+        kind: "ImageStreamTag"
+        name: "openjdk18-openshift:latest"
+  output:
+    to:
+      kind: "ImageStreamTag"
+      name: "kubakp:0.2"

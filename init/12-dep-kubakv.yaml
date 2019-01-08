@@ -1,0 +1,38 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kubakv
+  lables:
+    app: kubakv
+spec:
+  selector:
+    app: kubakv
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubakv
+  labels:
+    app: kubakv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubakv
+  template:
+    metadata:
+      labels:
+        app: kubakv
+    spec:
+      containers:
+      - name: kubakv
+        image: docker-registry.default.svc:5000/kubak/kubakv:0.2
+        env:
+        - name: "APP_REDIS_HOST"
+          value: "redis"
+        ports:
+        - containerPort: 8080

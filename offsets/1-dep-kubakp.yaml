@@ -1,0 +1,38 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: kubakp
+  lables:
+    app: kubakp
+spec:
+  selector:
+    app: kubakp
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubakp
+  labels:
+    app: kubakp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubakp
+  template:
+    metadata:
+      labels:
+        app: kubakp
+    spec:
+      containers:
+      - name: kubakp
+        image: docker-registry.default.svc:5000/kubak/kubakp:0.2
+        env:
+        - name: "BOOTSTRAP_SERVERS"
+          value: "kubak-kafka-bootstrap.kafka"
+        ports:
+        - containerPort: 8080
